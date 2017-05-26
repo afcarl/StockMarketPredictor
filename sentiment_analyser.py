@@ -1,7 +1,7 @@
 import tweepy
 from textblob import TextBlob
 import numpy as np
-from credentials import *
+from twitter_credentials import *
 
 def polarity(polarities):
     print(polarities)
