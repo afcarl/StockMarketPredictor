@@ -15,7 +15,7 @@ months = {  'jan':1,
             'dec':12
             }
 
-def parser(filepath):
+def parse(filepath):
     dates = []
     inc_prices = []
     dataset = pandas.read_csv(filepath)
@@ -26,7 +26,7 @@ def parser(filepath):
         cur_date[2] = int(cur_date[2])
         dates.append(cur_date)
         inc_prices.append(row[4]-row[1])
-    return dates,inc_prices
+    return np.asarray(dates),np.asarray(inc_prices)
 
 def normalize_data(data):
 	data = np.asarray(data,dtype=np.float32)
@@ -43,11 +43,20 @@ def split_data(dates,normalized_inc_prices):
     test_prices = normalized_inc_prices[len(train_dates):len(dates)]
     return train_dates,train_prices,test_dates,test_prices
 
+def change_dataset(dataset, look_back=1):
+	dataX, dataY = [], []
+	for i in range(len(dataset)-look_back-1):
+		dataX.append(dataset[i:(i+look_back)])
+		dataY.append(dataset[i + look_back])
+	return np.array(dataX), np.array(dataY)
+
 
 if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-    dates,inc_prices = parser(filepath='data/googl.csv')
+    # import matplotlib.pyplot as plt
+    dates,inc_prices = parse(filepath='data/googl.csv')
     normalized_inc_prices = normalize_data(inc_prices)
-    split_data(dates,normalized_inc_prices)
-    plt.plot(normalized_inc_prices)
+    train_dates,train_prices,test_dates,test_prices = split_data(dates,normalized_inc_prices)   # Dates datset is unused but processed
+    trainX,trainY = change_dataset(train_prices)
+    testX,testY = change_dataset(test_prices)
+    plt.plot(trainX)
     plt.show()
